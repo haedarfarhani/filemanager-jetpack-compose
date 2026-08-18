@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>File Manager</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--primary:#1976D2;--primary-light:#BBDEFB;--primary-dark:#0D47A1;--surface:#FFFFFF;--background:#F5F5F5;--on-surface:#212121;--on-surface-variant:#757575;--outline:#E0E0E0;--error:#D32F2F;--success:#388E3C;--warning:#F57C00;--radius:12px;--shadow:0 2px 8px rgba(0,0,0,0.08)}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--background);color:var(--on-surface);min-height:100vh;display:flex;flex-direction:column}
+.app-bar{background:var(--surface);border-bottom:1px solid var(--outline);padding:12px 16px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100;box-shadow:var(--shadow)}
+.app-bar h1{font-size:20px;font-weight:600;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border:none;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;transition:all 0.2s}
+.btn-primary{background:var(--primary);color:white}.btn-primary:hover{background:var(--primary-dark)}
+.btn-outline{background:transparent;color:var(--primary);border:1px solid var(--outline)}.btn-outline:hover{background:var(--primary-light)}
+.btn-danger{background:var(--error);color:white}.btn-danger:hover{background:#B71C1C}
+.btn-icon{width:40px;height:40px;padding:0;display:flex;align-items:center;justify-content:center;border-radius:50%;background:transparent;border:none;cursor:pointer;color:var(--on-surface-variant);font-size:20px;transition:all 0.2s}.btn-icon:hover{background:var(--outline)}
+.toolbar{background:var(--surface);padding:8px 16px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--outline);flex-wrap:wrap}
+.address-bar{flex:1;min-width:200px;display:flex;align-items:center;gap:4px;padding:8px 12px;background:var(--background);border-radius:8px;font-size:13px;overflow-x:auto;white-space:nowrap}
+.address-bar a{color:var(--primary);text-decoration:none;font-weight:500}.address-bar a:hover{text-decoration:underline}
+.address-bar span{color:var(--on-surface-variant)}
+.search-box{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--background);border-radius:8px;border:2px solid transparent;transition:border-color 0.2s}.search-box:focus-within{border-color:var(--primary)}
+.search-box input{border:none;background:none;outline:none;font-size:14px;width:200px;color:var(--on-surface)}
+.search-box button{background:none;border:none;cursor:pointer;color:var(--on-surface-variant);font-size:18px;padding:0}
+.container{flex:1;padding:16px;max-width:1200px;margin:0 auto;width:100%}
+.file-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.file-card{background:var(--surface);border-radius:var(--radius);padding:16px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:all 0.2s;border:2px solid transparent;text-decoration:none;color:var(--on-surface)}.file-card:hover{border-color:var(--primary);box-shadow:var(--shadow);transform:translateY(-1px)}
+.file-card.selected{border-color:var(--primary);background:var(--primary-light)}
+.file-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+.file-icon.folder{background:#E3F2FD;color:#1976D2}.file-icon.image{background:#E8F5E9;color:#4CAF50}.file-icon.video{background:#FCE4EC;color:#E91E63}.file-icon.audio{background:#F3E5F5;color:#9C27B0}.file-icon.document{background:#E3F2FD;color:#2196F3}.file-icon.archive{background:#FFF3E0;color:#FF9800}.file-icon.apk{background:#E8F5E9;color:#4CAF50}.file-icon.other{background:#ECEFF1;color:#607D8B}
+.file-info{flex:1;min-width:0}.file-name{font-weight:500;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.file-meta{font-size:12px;color:var(--on-surface-variant);margin-top:2px}
+.file-actions{display:flex;gap:4px;opacity:0;transition:opacity 0.2s}.file-card:hover .file-actions{opacity:1}
+.empty-state{text-align:center;padding:60px 20px;color:var(--on-surface-variant)}.empty-state .icon{font-size:64px;margin-bottom:16px;opacity:0.5}.empty-state h3{font-size:18px;margin-bottom:8px;color:var(--on-surface)}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);display:none;align-items:center;justify-content:center;z-index:200;backdrop-filter:blur(4px)}.modal-overlay.active{display:flex}
+.modal{background:var(--surface);border-radius:16px;padding:24px;width:90%;max-width:400px;box-shadow:0 8px 32px rgba(0,0,0,0.2)}.modal h2{font-size:18px;margin-bottom:16px}.modal input{width:100%;padding:12px;border:2px solid var(--outline);border-radius:8px;font-size:14px;outline:none;margin-bottom:16px;transition:border-color 0.2s}.modal input:focus{border-color:var(--primary)}
+.modal-actions{display:flex;justify-content:flex-end;gap:8px}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--on-surface);color:white;padding:12px 24px;border-radius:8px;font-size:14px;z-index:300;opacity:0;transition:opacity 0.3s}.toast.show{opacity:1}
+.upload-zone{border:2px dashed var(--outline);border-radius:var(--radius);padding:40px;text-align:center;cursor:pointer;transition:all 0.2s;margin-bottom:16px}.upload-zone:hover,.upload-zone.dragover{border-color:var(--primary);background:var(--primary-light)}
+.upload-zone .icon{font-size:48px;margin-bottom:8px;opacity:0.5}.upload-zone p{color:var(--on-surface-variant);font-size:14px}
+.progress-bar{height:4px;background:var(--outline);border-radius:2px;overflow:hidden;margin-top:8px}.progress-bar .fill{height:100%;background:var(--primary);transition:width 0.3s;width:0%}
+.context-menu{position:fixed;background:var(--surface);border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,0.15);z-index:250;min-width:180px;padding:8px 0;display:none}.context-menu.show{display:block}
+.context-menu-item{padding:10px 16px;display:flex;align-items:center;gap:10px;cursor:pointer;font-size:14px;transition:background 0.15s}.context-menu-item:hover{background:var(--background)}.context-menu-item.danger{color:var(--error)}
+.stats{display:flex;gap:16px;padding:8px 16px;background:var(--surface);border-bottom:1px solid var(--outline);font-size:13px;color:var(--on-surface-variant)}
+@media(max-width:600px){.file-grid{grid-template-columns:1fr}.search-box input{width:120px}.toolbar{flex-direction:column;align-items:stretch}}
+.checkbox{width:20px;height:20px;border-radius:4px;border:2px solid var(--outline);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.2s}.checkbox.checked{background:var(--primary);border-color:var(--primary);color:white}
+.selection-bar{background:var(--primary);color:white;padding:8px 16px;display:none;align-items:center;gap:12px;position:sticky;top:52px;z-index:99}.selection-bar.show{display:flex}
+</style>
+</head>
+<body>
+<div class="app-bar">
+    <button class="btn-icon" onclick="goBack()" id="backBtn" style="display:none">&#8592;</button>
+    <h1 id="pageTitle">&#128193; File Manager</h1>
+    <button class="btn-icon" onclick="toggleView()" id="viewBtn">&#8862;</button>
+    <button class="btn-icon" onclick="showUploadModal()">&#8593;</button>
+    <button class="btn-icon" onclick="showNewFolderModal()">+</button>
+    <button class="btn-icon" onclick="refreshFiles()">&#8635;</button>
+</div>
+<div class="toolbar">
+    <div class="address-bar" id="addressBar"></div>
+    <div class="search-box">
+        <button onclick="doSearch()">&#128269;</button>
+        <input type="text" id="searchInput" placeholder="Search files..." onkeyup="if(event.key==='Enter')doSearch()">
+        <button onclick="clearSearch()" id="clearSearchBtn" style="display:none">&#10005;</button>
+    </div>
+</div>
+<div class="stats" id="statsBar"></div>
+<div class="selection-bar" id="selectionBar">
+    <span id="selectionCount">0 selected</span>
+    <button class="btn" style="color:white" onclick="downloadSelected()">&#8595; Download</button>
+    <button class="btn" style="color:white" onclick="deleteSelected()">&#128465; Delete</button>
+    <button class="btn" style="color:white" onclick="clearSelection()">&#10005; Cancel</button>
+</div>
+<div class="container" id="fileContainer"></div>
+<div class="modal-overlay" id="modalOverlay" onclick="closeModals()">
+    <div class="modal" onclick="event.stopPropagation()">
+        <h2 id="modalTitle">New Folder</h2>
+        <input type="text" id="modalInput" placeholder="Name" onkeyup="if(event.key==='Enter')confirmModal()">
+        <div class="modal-actions">
+            <button class="btn btn-outline" onclick="closeModals()">Cancel</button>
+            <button class="btn btn-primary" onclick="confirmModal()">Confirm</button>
+        </div>
+    </div>
+</div>
+<div class="modal-overlay" id="uploadOverlay" onclick="closeUploadModal()">
+    <div class="modal" onclick="event.stopPropagation()" style="max-width:500px">
+        <h2>Upload Files</h2>
+        <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
+            <div class="icon">&#128229;</div>
+            <p>Click or drag files here to upload</p>
+        </div>
+        <input type="file" id="fileInput" multiple style="display:none" onchange="handleFiles(this.files)">
+        <div id="uploadProgress"></div>
+        <div class="modal-actions" style="margin-top:16px">
+            <button class="btn btn-outline" onclick="closeUploadModal()">Close</button>
+        </div>
+    </div>
+</div>
+<div class="context-menu" id="contextMenu">
+    <div class="context-menu-item" onclick="contextAction('download')">&#8595; Download</div>
+    <div class="context-menu-item" onclick="contextAction('rename')">&#9999; Rename</div>
+    <div class="context-menu-item danger" onclick="contextAction('delete')">&#128465; Delete</div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+let currentPath='',files=[],viewMode='grid',selectedFiles=new Set(),contextFile=null,modalCallback=null;
+const api=async(u,o={})=>{const r=await fetch(u,o);return r.json()};
+const enc=s=>encodeURIComponent(s).replace(/%20/g,' ');
+const formatSize=b=>{if(b===0)return'—';const u=['B','KB','MB','GB','TB'];let i=0,s=b;while(s>=1024&&i<u.length-1){s/=1024;i++}return i===0?b+' B':s.toFixed(1)+' '+u[i]};
+const getFileIcon=(n,dir)=>{if(dir)return'📁';const e=n.split('.').pop().toLowerCase();const m={jpg:'🖼️',jpeg:'🖼️',png:'🖼️',gif:'🖼️',webp:'🖼️',mp4:'🎬',mkv:'🎬',avi:'🎬',mov:'🎬',mp3:'🎵',wav:'🎵',flac:'🎵',aac:'🎵',pdf:'📄',doc:'📝',docx:'📝',xls:'📊',xlsx:'📊',ppt:'📑',zip:'📦',rar:'📦','7z':'📦',tar:'📦',txt:'📃',log:'📃',md:'📃',apk:'📱'};return m[e]||'📄'};
+const getFileColor=(n,dir)=>{if(dir)return'folder';const e=n.split('.').pop().toLowerCase();if(['jpg','jpeg','png','gif','webp','bmp'].includes(e))return'image';if(['mp4','mkv','avi','mov','webm','3gp'].includes(e))return'video';if(['mp3','wav','flac','aac','ogg'].includes(e))return'audio';if(['pdf','doc','docx','xls','xlsx','ppt','pptx'].includes(e))return'document';if(['zip','rar','7z','tar','gz'].includes(e))return'archive';if(['apk'].includes(e))return'apk';return'other'};
+
+async function loadFiles(path=''){
+    currentPath=path;
+    const data=await api('/api/files?path='+enc(path));
+    files=data;
+    renderFiles();
+    updateAddressBar();
+    updateBackButton();
+    document.getElementById('searchInput').value='';
+    document.getElementById('clearSearchBtn').style.display='none';
+}
+
+function renderFiles(filter=null){
+    const c=document.getElementById('fileContainer');
+    const items=filter||files;
+    if(items.length===0){
+        c.innerHTML='<div class="empty-state"><div class="icon">📂</div><h3>Nothing here</h3><p>This folder is empty</p></div>';
+        updateStats([]);
+        return;
+    }
+    if(viewMode==='grid'){
+        c.innerHTML='<div class="file-grid">'+items.map(f=>{
+            const color=getFileColor(f.name,f.isDirectory);
+            const icon=getFileIcon(f.name,f.isDirectory);
+            const meta=f.isDirectory?(items.length)+' items':formatSize(f.size);
+            const sel=selectedFiles.has(f.path);
+            return`<div class="file-card ${sel?'selected':''}" onclick="onFileClick(event,'${enc(f.path)}',${f.isDirectory})" oncontextmenu="showContextMenu(event,'${enc(f.path)}',${f.isDirectory},'${f.name.replace(/'/g,"\\'")}')">
+                <div class="checkbox ${sel?'checked':''}" onclick="event.stopPropagation();toggleSelect('${enc(f.path)}')">${sel?'✓':''}</div>
+                <div class="file-icon ${color}">${icon}</div>
+                <div class="file-info"><div class="file-name">${f.name}</div><div class="file-meta">${meta}</div></div>
+                <div class="file-actions">
+                    ${!f.isDirectory?`<button class="btn-icon" onclick="event.stopPropagation();downloadFile('${enc(f.path)}')" title="Download">↓</button>`:''}
+                    <button class="btn-icon" onclick="event.stopPropagation();showRenameModal('${enc(f.path)}','${f.name.replace(/'/g,"\\'")}')" title="Rename">✏️</button>
+                    <button class="btn-icon" onclick="event.stopPropagation();deleteFile('${enc(f.path)}','${f.name.replace(/'/g,"\\'")}')" title="Delete">🗑️</button>
+                </div>
+            </div>`}).join('')+'</div>';
+    } else {
+        c.innerHTML='<div style="background:var(--surface);border-radius:var(--radius);overflow:hidden">'+items.map(f=>{
+            const icon=getFileIcon(f.name,f.isDirectory);
+            const color=getFileColor(f.name,f.isDirectory);
+            const meta=f.isDirectory?'Folder':formatSize(f.size)+' • '+f.lastModified;
+            const sel=selectedFiles.has(f.path);
+            return`<div class="file-card" style="border-radius:0;border:none;border-bottom:1px solid var(--outline);margin:0" onclick="onFileClick(event,'${enc(f.path)}',${f.isDirectory})" oncontextmenu="showContextMenu(event,'${enc(f.path)}',${f.isDirectory},'${f.name.replace(/'/g,"\\'")}')">
+                <div class="checkbox ${sel?'checked':''}" onclick="event.stopPropagation();toggleSelect('${enc(f.path)}')">${sel?'✓':''}</div>
+                <div class="file-icon ${color}" style="width:40px;height:40px;font-size:20px;border-radius:10px">${icon}</div>
+                <div class="file-info"><div class="file-name">${f.name}</div><div class="file-meta">${meta}</div></div>
+                <div class="file-actions" style="opacity:1">
+                    ${!f.isDirectory?`<button class="btn-icon" onclick="event.stopPropagation();downloadFile('${enc(f.path)}')">↓</button>`:''}
+                    <button class="btn-icon" onclick="event.stopPropagation();showRenameModal('${enc(f.path)}','${f.name.replace(/'/g,"\\'")}')">✏️</button>
+                    <button class="btn-icon" onclick="event.stopPropagation();deleteFile('${enc(f.path)}','${f.name.replace(/'/g,"\\'")}')">🗑️</button>
+                </div>
+            </div>`}).join('')+'</div>';
+    }
+    updateStats(items);
+}
+
+function updateAddressBar(){
+    const ab=document.getElementById('addressBar');
+    const parts=currentPath.split('/').filter(s=>s);
+    let html='<a href="#" onclick="loadFiles();return false">📱 Internal Storage</a>';
+    let path='';
+    parts.forEach((p,i)=>{
+        path+='/'+p;
+        html+='<span>/</span><a href="#" onclick="loadFiles(\''+enc(path)+'\');return false">'+p+'</a>';
+    });
+    ab.innerHTML=html;
+    document.getElementById('pageTitle').textContent=parts.length?parts[parts.length-1]:'📁 File Manager';
+}
+
+function updateBackButton(){
+    document.getElementById('backBtn').style.display=currentPath?'block':'none';
+}
+
+function updateStats(items){
+    const dirs=items.filter(f=>f.isDirectory).length;
+    const fileCount=items.filter(f=>!f.isDirectory).length;
+    const totalSize=items.filter(f=>!f.isDirectory).reduce((s,f)=>s+f.size,0);
+    document.getElementById('statsBar').innerHTML=items.length?`${dirs} folders, ${fileCount} files${totalSize?' • '+formatSize(totalSize):''}`:'';
+}
+
+function goBack(){
+    if(!currentPath)return;
+    const parts=currentPath.split('/').filter(s=>s);
+    parts.pop();
+    loadFiles(parts.join('/'));
+}
+
+function onFileClick(e,path,isDir){
+    if(isDir)loadFiles(decodeURIComponent(path));
+    else downloadFile(path);
+}
+
+function downloadFile(path){window.open('/api/download/'+path,'_blank')}
+
+function downloadSelected(){selectedFiles.forEach(p=>downloadFile(p));clearSelection()}
+
+function deleteFile(path,name){
+    contextFile={path,name};
+    if(confirm('Delete "'+name+'"?\n\nThis cannot be undone.')){
+        api('/api/delete',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({path:decodeURIComponent(path)})}).then(d=>{
+            if(d.success){showToast('Deleted');refreshFiles()}else showToast(d.error||'Error')
+        });
+    }
+}
+
+function deleteSelected(){
+    const count=selectedFiles.size;
+    if(!count||!confirm('Delete '+count+' item(s)?'))return;
+    let done=0;
+    selectedFiles.forEach(p=>{
+        api('/api/delete',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({path:decodeURIComponent(p)})}).then(()=>{
+            done++;if(done===count){showToast('Deleted '+count+' items');clearSelection();refreshFiles()}
+        });
+    });
+}
+
+function showRenameModal(path,name){
+    document.getElementById('modalTitle').textContent='Rename';
+    document.getElementById('modalInput').value=name;
+    document.getElementById('modalOverlay').classList.add('active');
+    modalCallback=()=>{
+        const newName=document.getElementById('modalInput').value.trim();
+        if(newName&&newName!==name){
+            api('/api/rename',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({path:decodeURIComponent(path),newName})}).then(d=>{
+                if(d.success){showToast('Renamed');refreshFiles()}else showToast(d.error||'Error')
+            });
+        }
+        closeModals();
+    };
+    setTimeout(()=>document.getElementById('modalInput').select(),100);
+}
+
+function showNewFolderModal(){
+    document.getElementById('modalTitle').textContent='New Folder';
+    document.getElementById('modalInput').value='';
+    document.getElementById('modalOverlay').classList.add('active');
+    modalCallback=()=>{
+        const name=document.getElementById('modalInput').value.trim();
+        if(name){
+            api('/api/mkdir',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({path:currentPath,name})}).then(d=>{
+                if(d.success){showToast('Created');refreshFiles()}else showToast(d.error||'Error')
+            });
+        }
+        closeModals();
+    };
+    setTimeout(()=>document.getElementById('modalInput').focus(),100);
+}
+
+function confirmModal(){if(modalCallback)modalCallback()}
+function closeModals(){document.getElementById('modalOverlay').classList.remove('active');modalCallback=null}
+
+function showUploadModal(){document.getElementById('uploadOverlay').classList.add('active')}
+function closeUploadModal(){document.getElementById('uploadOverlay').classList.remove('active');document.getElementById('uploadProgress').innerHTML=''}
+
+function handleFiles(files){
+    const zone=document.getElementById('uploadZone');
+    const prog=document.getElementById('uploadProgress');
+    zone.innerHTML='<div class="icon">⏳</div><p>Uploading...</p>';
+    let done=0;
+    Array.from(files).forEach(f=>{
+        const fd=new FormData();
+        fd.append(f.name,f);
+        fetch('/api/upload?path='+enc(currentPath),{method:'POST',body:fd}).then(r=>r.json()).then(d=>{
+            done++;
+            if(done===files.length){zone.innerHTML='<div class="icon">✅</div><p>Upload complete!</p>';showToast('Uploaded '+files.length+' file(s)');refreshFiles()}
+        }).catch(()=>{done++;if(done===files.length){zone.innerHTML='<div class="icon">❌</div><p>Upload failed</p>'}});
+    });
+}
+
+const dz=document.getElementById('uploadZone');
+dz.ondragover=e=>{e.preventDefault();dz.classList.add('dragover')};
+dz.ondragleave=()=>dz.classList.remove('dragover');
+dz.ondrop=e=>{e.preventDefault();dz.classList.remove('dragover');handleFiles(e.dataTransfer.files)};
+
+function toggleSelect(path){
+    if(selectedFiles.has(path))selectedFiles.delete(path);else selectedFiles.add(path);
+    document.getElementById('selectionBar').classList.toggle('show',selectedFiles.size>0);
+    document.getElementById('selectionCount').textContent=selectedFiles.size+' selected';
+    renderFiles();
+}
+
+function clearSelection(){selectedFiles.clear();document.getElementById('selectionBar').classList.remove('show');renderFiles()}
+
+function showContextMenu(e,path,isDir,name){
+    e.preventDefault();e.stopPropagation();
+    contextFile={path,isDir,name};
+    const m=document.getElementById('contextMenu');
+    m.style.left=Math.min(e.clientX,window.innerWidth-200)+'px';
+    m.style.top=Math.min(e.clientY,window.innerHeight-150)+'px';
+    m.classList.add('show');
+}
+
+function contextAction(action){
+    const m=document.getElementById('contextMenu');m.classList.remove('show');
+    if(!contextFile)return;
+    if(action==='download')downloadFile(contextFile.path);
+    else if(action==='rename')showRenameModal(contextFile.path,contextFile.name);
+    else if(action==='delete')deleteFile(contextFile.path,contextFile.name);
+    contextFile=null;
+}
+
+document.addEventListener('click',()=>document.getElementById('contextMenu').classList.remove('show'));
+
+async function doSearch(){
+    const q=document.getElementById('searchInput').value.trim();
+    if(!q)return;
+    document.getElementById('clearSearchBtn').style.display='block';
+    const data=await api('/api/search?q='+enc(q)+'&path='+enc(currentPath));
+    files=data;
+    renderFiles(data);
+}
+
+function clearSearch(){document.getElementById('searchInput').value='';document.getElementById('clearSearchBtn').style.display='none';loadFiles(currentPath)}
+
+function toggleView(){viewMode=viewMode==='grid'?'list':'grid';document.getElementById('viewBtn').textContent=viewMode==='grid'?'⊞':'≡';renderFiles()}
+
+function refreshFiles(){loadFiles(currentPath)}
+
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000)}
+
+document.addEventListener('keydown',e=>{
+    if(e.key==='Escape'){closeModals();closeUploadModal();clearSelection()}
+    if(e.key==='Delete'&&selectedFiles.size)deleteSelected();
+    if(e.ctrlKey&&e.key==='a'){e.preventDefault();files.forEach(f=>selectedFiles.add(f.path));document.getElementById('selectionBar').classList.add('show');document.getElementById('selectionCount').textContent=selectedFiles.size+' selected';renderFiles()}
+});
+
+loadFiles();
+</script>
+</body>
+</html>
