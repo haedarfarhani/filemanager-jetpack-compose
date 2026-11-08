@@ -6,10 +6,8 @@ import android.os.Environment
 import android.os.storage.StorageManager
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import ir.heydar.nexfolder.core.util.FileSizeFormatter
-import ir.heydar.nexfolder.domain.model.StorageVolumeInfo
 import dagger.hilt.android.lifecycle.HiltViewModel
-import jakarta.inject.Inject
+import ir.heydar.nexfolder.domain.model.StorageVolumeInfo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -18,6 +16,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
+import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(

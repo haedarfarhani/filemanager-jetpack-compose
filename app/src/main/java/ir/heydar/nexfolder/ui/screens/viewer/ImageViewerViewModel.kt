@@ -3,9 +3,8 @@ package ir.heydar.nexfolder.ui.screens.viewer
 import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import ir.heydar.nexfolder.core.history.RecentsManager
 import dagger.hilt.android.lifecycle.HiltViewModel
-import jakarta.inject.Inject
+import ir.heydar.nexfolder.core.history.RecentsManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -13,6 +12,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.io.File
+import javax.inject.Inject
 
 @HiltViewModel
 class ImageViewerViewModel @Inject constructor(

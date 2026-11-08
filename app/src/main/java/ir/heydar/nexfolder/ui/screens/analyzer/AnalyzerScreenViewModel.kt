@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import ir.heydar.nexfolder.core.analyzer.StorageAnalyzer
 import dagger.hilt.android.lifecycle.HiltViewModel
-import jakarta.inject.Inject
+import javax.inject.Inject
 import java.io.File
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job

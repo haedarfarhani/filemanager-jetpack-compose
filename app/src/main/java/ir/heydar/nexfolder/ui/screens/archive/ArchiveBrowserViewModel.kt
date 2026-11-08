@@ -9,7 +9,7 @@ import ir.heydar.nexfolder.core.archive.ArchivePasswordException
 import ir.heydar.nexfolder.core.files.FileOperations
 import ir.heydar.nexfolder.core.files.OperationProgress
 import dagger.hilt.android.lifecycle.HiltViewModel
-import jakarta.inject.Inject
+import javax.inject.Inject
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job

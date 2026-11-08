@@ -43,8 +43,8 @@ A modern Android file manager application built with Jetpack Compose and Materia
 The project follows **MVVM (Model-View-ViewModel)** architecture pattern with a clean layered structure:
 
 ```
-app/src/main/java/com/heydar/filemanager/
-├── FileManagerApp.kt                    # Application class (Hilt entry point)
+app/src/main/java/ir/heydar/nexfolder/
+├── NexFolderApp.kt                      # Application class (Hilt entry point)
 ├── di/
 │   └── AppModule.kt                     # Hilt dependency injection module
 ├── core/

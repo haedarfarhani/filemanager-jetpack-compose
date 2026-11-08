@@ -7,7 +7,7 @@ import ir.heydar.nexfolder.core.util.FileMetadataExtractor
 import ir.heydar.nexfolder.core.util.FileShareManager
 import ir.heydar.nexfolder.domain.model.SpecificFileInfo
 import dagger.hilt.android.lifecycle.HiltViewModel
-import jakarta.inject.Inject
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow

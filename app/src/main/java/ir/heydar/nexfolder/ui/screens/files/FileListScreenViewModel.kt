@@ -6,6 +6,7 @@ import android.content.Intent
 import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import ir.heydar.nexfolder.core.archive.ArchivePasswordException
 import ir.heydar.nexfolder.core.files.FileOperations
 import ir.heydar.nexfolder.core.files.OperationProgress
@@ -18,8 +19,6 @@ import ir.heydar.nexfolder.domain.model.FileFormat
 import ir.heydar.nexfolder.domain.model.FileItem
 import ir.heydar.nexfolder.domain.model.FileType
 import ir.heydar.nexfolder.domain.model.SortMode
-import dagger.hilt.android.lifecycle.HiltViewModel
-import jakarta.inject.Inject
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -31,6 +30,7 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
+import javax.inject.Inject
 
 @HiltViewModel
 class FileListViewModel @Inject constructor(

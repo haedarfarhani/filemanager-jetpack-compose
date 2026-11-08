@@ -1,5 +1,8 @@
 package ir.heydar.nexfolder.ui.components.file
 
+import android.content.Context
+import android.graphics.Bitmap
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
@@ -13,11 +16,14 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.produceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -32,6 +38,7 @@ import coil.request.videoFrameMillis
 import ir.heydar.nexfolder.core.icons.FileExtensionIcons
 import ir.heydar.nexfolder.core.icons.FileIconResolver
 import ir.heydar.nexfolder.core.icons.FolderIconResolver
+import ir.heydar.nexfolder.core.media.FilePreviewLoader
 import ir.heydar.nexfolder.domain.model.DirectoryType
 import ir.heydar.nexfolder.domain.model.FileFormat
 import ir.heydar.nexfolder.domain.model.FileItem
@@ -69,6 +76,16 @@ fun FileIcon(
         )
         fileItem.isVideo -> VideoThumbnail(
             path = fileItem.path,
+            modifier = modifier,
+            size = size
+        )
+        fileItem.extension == "pdf" -> PdfThumbnail(
+            fileItem = fileItem,
+            modifier = modifier,
+            size = size
+        )
+        fileItem.fileType == FileType.APK -> ApkIconThumbnail(
+            fileItem = fileItem,
             modifier = modifier,
             size = size
         )
@@ -311,5 +328,57 @@ private fun VideoThumbnail(
                 .background(Color.Black.copy(alpha = 0.42f), RoundedCornerShape(50))
                 .padding(size * 0.05f)
         )
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Rich previews: PDF first page & embedded APK icon
+// ---------------------------------------------------------------------------
+
+@Composable
+private fun PdfThumbnail(
+    fileItem: FileItem,
+    modifier: Modifier = Modifier,
+    size: Dp = 40.dp
+) {
+    val bitmap by produceState<Bitmap?>(initialValue = null, key1 = fileItem.path) {
+        value = FilePreviewLoader.pdfThumbnail(fileItem.path)
+    }
+    if (bitmap != null) {
+        Image(
+            bitmap = bitmap!!.asImageBitmap(),
+            contentDescription = null,
+            modifier = modifier
+                .size(size)
+                .clip(RoundedCornerShape(size * 0.28f)),
+            contentScale = ContentScale.Crop
+        )
+    } else {
+        // Static PDF page artwork while rendering (or when the PDF cannot be opened)
+        FileTypeIcon(fileItem = fileItem, modifier = modifier, size = size)
+    }
+}
+
+@Composable
+private fun ApkIconThumbnail(
+    fileItem: FileItem,
+    modifier: Modifier = Modifier,
+    size: Dp = 40.dp
+) {
+    val bitmap by produceState<Bitmap?>(initialValue = null, key1 = fileItem.path) {
+        value = FilePreviewLoader.apkIcon(fileItem.path)
+    }
+    if (bitmap != null) {
+        Image(
+            bitmap = bitmap!!.asImageBitmap(),
+            contentDescription = null,
+            modifier = modifier
+                .size(size)
+                .clip(RoundedCornerShape(size * 0.28f)),
+            contentScale = ContentScale.Crop
+        )
+    } else {
+        // Generic APK artwork while the archive is being parsed
+        FileTypeIcon(fileItem = fileItem, modifier = modifier, size = size)
     }
 }

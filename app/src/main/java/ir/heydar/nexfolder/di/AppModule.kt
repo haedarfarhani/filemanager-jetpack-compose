@@ -2,13 +2,13 @@ package ir.heydar.nexfolder.di
 
 import android.app.Application
 import android.content.Context
-import ir.heydar.nexfolder.data.local.RecentFileDao
-import ir.heydar.nexfolder.data.local.RecentsDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import jakarta.inject.Singleton
+import ir.heydar.nexfolder.data.local.RecentFileDao
+import ir.heydar.nexfolder.data.local.RecentsDatabase
+import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)

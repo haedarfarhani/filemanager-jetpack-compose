@@ -7,7 +7,7 @@ import ir.heydar.nexfolder.core.network.NetworkDiscoveryManager
 import ir.heydar.nexfolder.domain.model.network.NetworkProtocol
 import ir.heydar.nexfolder.domain.model.network.NetworkShareInfo
 import dagger.hilt.android.lifecycle.HiltViewModel
-import jakarta.inject.Inject
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

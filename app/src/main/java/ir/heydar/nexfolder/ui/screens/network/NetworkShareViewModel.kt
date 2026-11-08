@@ -13,7 +13,7 @@ import androidx.lifecycle.viewModelScope
 import ir.heydar.nexfolder.core.network.NetworkPermissionHelper
 import ir.heydar.nexfolder.core.network.ServerForegroundService
 import dagger.hilt.android.lifecycle.HiltViewModel
-import jakarta.inject.Inject
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

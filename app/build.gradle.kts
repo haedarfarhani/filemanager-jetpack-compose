@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.heydar.filemanager"
+    namespace = "ir.heydar.nexfolder"
     compileSdk = 37
 
     defaultConfig {

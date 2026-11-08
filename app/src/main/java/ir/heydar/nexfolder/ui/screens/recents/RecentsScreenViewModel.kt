@@ -9,7 +9,7 @@ import ir.heydar.nexfolder.core.media.MediaStoreQueries
 import ir.heydar.nexfolder.domain.model.FileItem
 import ir.heydar.nexfolder.domain.model.FileType
 import dagger.hilt.android.lifecycle.HiltViewModel
-import jakarta.inject.Inject
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

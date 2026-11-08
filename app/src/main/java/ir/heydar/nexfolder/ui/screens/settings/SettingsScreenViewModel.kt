@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import ir.heydar.nexfolder.core.settings.AppSettings
 import ir.heydar.nexfolder.core.settings.SettingsManager
 import dagger.hilt.android.lifecycle.HiltViewModel
-import jakarta.inject.Inject
+import javax.inject.Inject
 import kotlinx.coroutines.flow.StateFlow
 
 @HiltViewModel

@@ -13,7 +13,7 @@ import ir.heydar.nexfolder.core.util.FileSizeFormatter
 import ir.heydar.nexfolder.domain.model.network.RemoteConnection
 import ir.heydar.nexfolder.domain.model.network.RemoteFileEntry
 import dagger.hilt.android.lifecycle.HiltViewModel
-import jakarta.inject.Inject
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

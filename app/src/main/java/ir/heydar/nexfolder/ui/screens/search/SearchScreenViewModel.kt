@@ -6,13 +6,12 @@ import android.os.Environment
 import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import ir.heydar.nexfolder.core.search.FileSearchEngine
 import ir.heydar.nexfolder.core.util.MimeTypeHelper
 import ir.heydar.nexfolder.domain.model.FileType
 import ir.heydar.nexfolder.domain.model.SearchFilter
 import ir.heydar.nexfolder.domain.model.SearchResult
-import dagger.hilt.android.lifecycle.HiltViewModel
-import jakarta.inject.Inject
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -22,8 +21,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.io.File
+import javax.inject.Inject
 
 @HiltViewModel
 class SearchViewModel @Inject constructor(
