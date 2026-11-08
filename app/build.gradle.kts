@@ -10,7 +10,7 @@ android {
     compileSdk = 37
 
     defaultConfig {
-        applicationId = "com.heydar.filemanager"
+        applicationId = "ir.heydar.nexfolder"
         minSdk = 24
         targetSdk = 37
         versionCode = 1
@@ -60,6 +60,7 @@ dependencies {
     ksp(libs.hilt.android.compiler)
     ksp(libs.androidx.hilt.compiler)
     implementation(libs.coil.compose)
+    implementation(libs.coil.video) // video-frame thumbnails in file lists
 
     // Network
     implementation(libs.nanohttpd)
@@ -68,4 +69,23 @@ dependencies {
     implementation(libs.zxing.android.embedded)
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.coroutines.android)
+
+    // Archives
+    implementation(libs.commons.compress)
+    implementation(libs.zip4j)
+
+    // Network clients
+    implementation(libs.commons.net) // FTP
+    implementation(libs.sshj) // SFTP
+    implementation(libs.jcifs.ng) // SMB2/3
+    // WebDAV is implemented in-app (HttpURLConnection + XmlPullParser) — no extra dependency
+    implementation(libs.slf4j.android)
+
+    // Media playback
+    implementation(libs.media3.exoplayer)
+
+    // Recents history
+    implementation(libs.room.runtime)
+    implementation(libs.room.ktx)
+    ksp(libs.room.compiler)
 }

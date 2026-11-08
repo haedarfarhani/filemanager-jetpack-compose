@@ -1,0 +1,18 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+  <!-- USB flash drive body -->
+  <path
+      android:fillColor="#FFFFFF"
+      android:pathData="M9,10h6v11a1,1 0 0,1 -1,1h-4a1,1 0 0,1 -1,-1V10z"/>
+  <!-- Connector head -->
+  <path
+      android:fillColor="#FFFFFF"
+      android:pathData="M10,3h4v6h-4z"/>
+  <!-- Connector pins -->
+  <path
+      android:fillColor="#6B000000"
+      android:pathData="M11,5h0.9v2h-0.9zM12.9,5h0.9v2h-0.9z"/>
+</vector>
